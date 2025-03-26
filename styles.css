@@ -1,0 +1,93 @@
+/* Add these styles for game mode selection */
+#game-modes {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.mode-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.mode-btn {
+    padding: 15px 25px;
+    background-color: #16213e;
+    color: white;
+    border: 2px solid #e94560;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    min-width: 200px;
+    text-align: center;
+}
+
+.mode-btn:hover {
+    background-color: #0f3460;
+    transform: translateY(-2px);
+}
+
+.mode-btn.selected {
+    background-color: #e94560;
+    border-color: #e94560;
+    box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+}
+
+#start-btn {
+    font-size: 18px;
+    padding: 15px 30px;
+    background-color: #e94560;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    transition: all 0.3s;
+    margin-top: 20px;
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+#start-btn:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+#start-btn:not(:disabled):hover {
+    background-color: #ff2e63;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 46, 99, 0.7);
+}
+
+#time-display {
+    color: #e94560;
+    margin-bottom: 5px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    text-align: center;
+    padding: 10px;
+    background-color: rgba(15, 52, 96, 0.8);
+    border-radius: 5px;
+    border: 2px solid #e94560;
+}
+
+#time-display.warning {
+    color: #ff2e63;
+    border-color: #ff2e63;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

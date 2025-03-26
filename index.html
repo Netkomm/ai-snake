@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a2e;
+            font-family: 'Press Start 2P', cursive;
+            color: #e6e6e6;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            border-radius: 10px;
+        }
+        #game-canvas {
+            display: block;
+            border: 4px solid #34495e;
+            background-color: #0f3460;
+            border-radius: 5px;
+            margin: 0;
+            padding: 0;
+        }
+        #score-container {
+            display: flex;
+            justify-content: space-between;
+            width: 500px;
+            margin-bottom: 20px;
+        }
+        #score, #high-score {
+            color: #f8f1f1;
+            font-size: 16px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #e94560;
+            font-size: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10;
+            min-width: 300px;
+        }
+        
+        #game-over-modes {
+            margin: 15px 0;
+        }
+        
+        #game-over-modes h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        #restart-btn, .game-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.3s;
+        }
+        
+        #restart-btn:hover, .game-btn:hover {
+            background-color: #ff2e63;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 46, 99, 0.7);
+        }
+        
+        #game-over #show-leaderboard-btn {
+            margin-top: 10px;
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+        }
+        
+        /* Intro screen */
+        #intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        #game-title {
+            font-size: 48px;
+            color: #e94560;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.7);
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        #start-btn {
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        /* Leaderboard */
+        #leaderboard-container {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(15, 52, 96, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 15;
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 3px solid #e94560;
+        }
+        #leaderboard-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #e94560;
+        }
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #e94560;
+        }
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+        .leaderboard-rank {
+            color: #e94560;
+        }
+        .leaderboard-score {
+            color: #f8f1f1;
+        }
+        #leaderboard-close {
+            margin-top: 15px;
+            width: 100%;
+        }
+        #leaderboard-btn {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+        
+        /* Name input */
+        #name-input-container {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(15, 52, 96, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 15;
+            text-align: center;
+            border: 3px solid #e94560;
+        }
+        #player-name {
+            margin: 15px 0;
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #1a1a2e;
+            border: 2px solid #e94560;
+            color: #f8f1f1;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        /* Game controls */
+        #game-controls {
+            display: flex;
+            justify-content: flex-end;
+            width: 500px;
+            margin-top: 15px;
+        }
+        
+        /* Top controls */
+        #top-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 500px;
+            margin-bottom: 10px;
+        }
+        
+        /* Sound controls */
+        #sound-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        #mute-btn {
+            background: none;
+            border: none;
+            color: #e94560;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        /* Game modes */
+        /* Game modes */
+        #game-modes {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .mode-btn {
+            padding: 10px 15px;
+            background-color: #16213e;
+            color: white;
+            border: 2px solid #e94560;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn:hover {
+            background-color: #1a1a2e;
+            transform: scale(1.05);
+        }
+        
+        .mode-btn.selected {
+            background-color: #e94560;
+            color: white;
+        }
+        
+        /* Power-up indicator */
+        #power-up-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #e94560;
+            color: white;
+            font-size: 12px;
+            z-index: 5;
+        }
+        
+        #power-up-timer {
+            margin-top: 5px;
+            height: 5px;
+            background-color: #e94560;
+            width: 100%;
+            border-radius: 3px;
+        }
+        
+        #game-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        #time-display {
+            color: #e94560;
+            margin-bottom: 5px;
+        }
+        
+        /* Fruit styles */
+        .fruit {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        /* Dynamic background */
+        #background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: starMove 8s linear infinite;
+        }
+        
+        @keyframes starMove {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+        
+        /* Obstacles */
+        .obstacle {
+            position: absolute;
+            background-color: #e94560;
+            border-radius: 3px;
+        }
+        
+        /* Power-up animation */
+        @keyframes powerUpPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .power-up {
+            animation: powerUpPulse 1s infinite;
+        }
+        
+        /* Animations */
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #e94560, 0 0 10px #e94560;
+            }
+            to {
+                text-shadow: 0 0 10px #e94560, 0 0 20px #e94560, 0 0 30px #e94560;
+            }
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        .snake-title {
+            position: relative;
+            display: inline-block;
+            animation: snakeMove 3s infinite;
+        }
+        @keyframes snakeMove {
+            0% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(10px) rotate(5deg); }
+            50% { transform: translateX(0) rotate(0deg); }
+            75% { transform: translateX(-10px) rotate(-5deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+        
+        /* Food animation */
+        .food-effect {
+            position: absolute;
+            pointer-events: none;
+            font-size: 20px;
+            animation: foodEffect 1s forwards;
+        }
+        @keyframes foodEffect {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+        
+        #time-display-container {
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            bottom: 0;
+        }
+        
+        #time-display {
+            display: none;
+            color: #e94560;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            text-align: center;
+            padding: 10px 0;
+            background-color: rgba(15, 52, 96, 0.8);
+            margin: 0;
+        }
+        
+        #time-display.warning {
+            color: #ff2e63;
+            border-color: #ff2e63;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        #leaderboards-overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(15, 52, 96, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 25;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 3px solid #e94560;
+        }
+        
+        .leaderboards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .leaderboard-section {
+            background-color: rgba(26, 26, 46, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e94560;
+        }
+        
+        .leaderboard-section h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .leaderboard-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #e94560;
+            font-size: 24px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        #show-leaderboards-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.3s;
+            z-index: 30;
+        }
+        
+        #show-leaderboards-btn:hover {
+            background-color: #ff2e63;
+            transform: scale(1.05);
+        }
+        
+        #credits-link {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #e94560;
+            font-size: 12px;
+            text-decoration: none;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.3s;
+            z-index: 30;
+        }
+        
+        #credits-link:hover {
+            color: #ff2e63;
+            transform: translateX(-50%) scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="intro-screen">
+        <h1 id="game-title"><span class="snake-title">SNAKE</span> GAME</h1>
+        <div id="game-modes">
+            <h3>Select Game Mode</h3>
+            <div class="mode-buttons">
+                <button id="classic-mode" class="mode-btn">Classic</button>
+                <button id="time-mode" class="mode-btn">Time Attack</button>
+                <button id="survival-mode" class="mode-btn">Survival</button>
+                <button id="ai-mode" class="mode-btn">VS AI</button>
+            </div>
+        </div>
+        <button id="start-btn" class="game-btn">START GAME</button>
+    </div>
+    
+    <button id="show-leaderboards-btn" class="game-btn">Leaderboards</button>
+    <a href="credits.html" id="credits-link">Credits</a>
+    
+    <div id="top-controls">
+        <div id="score-container">
+            <div id="score">Score: 0</div>
+            <div id="high-score">High Score: 0</div>
+        </div>
+    </div>
+    
+    <div id="game-container">
+        <canvas id="game-canvas" width="480" height="540"></canvas>
+        <div id="time-display-container">
+            <div id="time-display">Time Remaining: 60s</div>
+        </div>
+        <div id="game-over">
+            Game Over!
+            <div id="game-over-modes">
+                <h3>Select Mode</h3>
+                <div class="mode-buttons">
+                    <button id="go-classic-mode" class="mode-btn">Classic</button>
+                    <button id="go-time-mode" class="mode-btn">Time Attack</button>
+                    <button id="go-survival-mode" class="mode-btn">Survival</button>
+                    <button id="go-ai-mode" class="mode-btn">VS AI</button>
+                </div>
+            </div>
+            <button id="restart-btn">Restart</button>
+            <button id="show-leaderboard-btn" class="game-btn">Leaderboard</button>
+        </div>
+    </div>
+    
+    <div id="game-controls">
+        <div id="sound-controls">
+            <button id="mute-btn">🔊</button>
+        </div>
+    </div>
+    
+    <div id="leaderboard-container">
+        <h2 id="leaderboard-title">Leaderboard</h2>
+        <div id="leaderboard-entries"></div>
+        <button id="leaderboard-close" class="game-btn">Close</button>
+    </div>
+    
+    <div id="name-input-container">
+        <h3>New High Score!</h3>
+        <p>Enter your name:</p>
+        <input type="text" id="player-name" maxlength="10" placeholder="Your Name">
+        <button id="save-score-btn" class="game-btn">Save Score</button>
+    </div>
+    
+    <audio id="eat-sound" src="assets/audio/eat.mp3" preload="auto"></audio>
+    <audio id="game-over-sound" src="assets/audio/game-over.mp3" preload="auto"></audio>
+    <audio id="background-music" src="assets/audio/background.mp3" preload="auto" loop></audio>
+    
+    <div id="leaderboards-overlay">
+        <button class="leaderboard-close">&times;</button>
+        <h2 style="text-align: center; color: #e94560; margin-bottom: 20px;">Leaderboards</h2>
+        <div class="leaderboards-grid">
+            <div class="leaderboard-section">
+                <h3>Classic Mode</h3>
+                <div id="classic-leaderboard"></div>
+            </div>
+            <div class="leaderboard-section">
+                <h3>Time Attack</h3>
+                <div id="time-attack-leaderboard"></div>
+            </div>
+            <div class="leaderboard-section">
+                <h3>Survival Mode</h3>
+                <div id="survival-leaderboard"></div>
+            </div>
+            <div class="leaderboard-section">
+                <h3>VS AI Mode</h3>
+                <div id="ai-leaderboard"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update the script tag for game.js -->
+    <script type="module" src="game.js"></script>
+</body>
+</html>
