@@ -14,7 +14,7 @@ export const COLORS = {
 
 export const GAME_MODES = {
     classic: { name: 'Classic', initialSpeed: 100, speedIncrease: true },
-    timeAttack: { name: 'Time Attack', initialSpeed: 100, timeLimit: 120000, speedIncrease: true },
+    timeAttack: { name: 'Time Attack', initialSpeed: 100, timeLimit: 120, speedIncrease: true },
     survival: { name: 'Survival', initialSpeed: 100, obstacles: true, speedIncrease: true, maxBlocks: 20 },
     ai: { name: 'VS AI', initialSpeed: 100, aiOpponent: true, speedIncrease: true }
 };

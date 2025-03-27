@@ -1,6 +1,6 @@
 class Database {
     constructor() {
-        this.baseUrl = 'http://localhost:3000';
+        this.baseUrl = window.location.origin;
     }
 
     async getHighScore(mode) {

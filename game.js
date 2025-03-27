@@ -252,11 +252,11 @@ class Game {
         }
         
         if (this.gameState.timeLeft > 0) {
-            this.gameState.timeLeft = Math.max(0, this.gameState.timeLeft - 1000);
+            this.gameState.timeLeft--;
             this.updateTimeDisplay();
             
             // Add warning animation for last 30 seconds
-            if (this.gameState.timeLeft <= 30000 && !this.gameState.isCountdownWarning) {
+            if (this.gameState.timeLeft <= 30 && !this.gameState.isCountdownWarning) {
                 this.gameState.isCountdownWarning = true;
                 const timeDisplay = document.getElementById('time-display');
                 if (timeDisplay) {
@@ -264,18 +264,21 @@ class Game {
                     timeDisplay.style.animation = 'pulse 1s infinite';
                 }
             }
-            
-            if (this.gameState.timeLeft <= 0) {
-                this.gameOver();
-            }
+        }
+        
+        // Check if time is up and trigger game over
+        if (this.gameState.timeLeft <= 0) {
+            this.gameState.timeLeft = 0;
+            this.updateTimeDisplay();
+            this.gameOver();
         }
     }
 
     updateTimeDisplay() {
         if (this.gameState.currentGameMode !== 'timeAttack') return;
         
-        const minutes = Math.floor(this.gameState.timeLeft / 60000);
-        const seconds = Math.ceil((this.gameState.timeLeft % 60000) / 1000);
+        const minutes = Math.floor(this.gameState.timeLeft / 60);
+        const seconds = this.gameState.timeLeft % 60;
         const timeDisplay = document.getElementById('time-display');
         if (timeDisplay) {
             timeDisplay.textContent = `Time Remaining: ${minutes}:${seconds.toString().padStart(2, '0')}`;
